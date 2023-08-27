@@ -1,0 +1,28 @@
+{
+  "bindings": [
+    {
+      "authLevel": "anonymous",
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "req",
+      "methods": [
+        "post"
+      ]
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "res"
+    },
+    {
+      "name": "productDocument",
+      "type": "cosmosDB",
+      "databaseName": "catalog",
+      "collectionName": "products",
+      "createIfNotExists": true,
+      "connectionStringSetting": "CosmosDbConnectionString",
+      "direction": "out"
+    }
+  ],
+  "scriptFile": "../dist/createproduct/index.js"
+}

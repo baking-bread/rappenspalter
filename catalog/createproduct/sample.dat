@@ -1,0 +1,13 @@
+{
+    "vendor": "Azure",
+    "name": "Azure",
+    "subject_designation": "Some Product",
+    "price": {
+        "value": 42,
+        "currency": "CHF"
+    },
+    "quantity": {
+        "value": 100,
+        "unit": "%"
+    }
+}
