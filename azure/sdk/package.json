@@ -24,6 +24,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@azure/arm-appservice": "^14.0.0",
     "@azure/arm-consumption": "^9.2.0",
     "@azure/arm-cosmosdb": "^15.5.0",
     "@azure/arm-resources": "^5.2.0",

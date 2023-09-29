@@ -21,3 +21,14 @@ export function getCredentials() {
     }
     return credentials;
 }
+
+export function getClient<T>(clientClass: new (credentials: any, subscriptionId: string) => T): T {
+    const subscriptionId = process.env.AZURE_SUBSCRIPTION_ID;
+    const credentials = getCredentials();
+
+    if (!subscriptionId) {
+        throw new Error("AZURE_SUBSCRIPTION_ID is not set");
+    }
+
+    return new clientClass(credentials, subscriptionId);
+}
