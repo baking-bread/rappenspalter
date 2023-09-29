@@ -1,62 +1,28 @@
 import 'dotenv/config'
 import { setLogLevel, AzureLogLevel } from "@azure/logger";
-import { ResourceGroup, ResourceManagementClient } from "@azure/arm-resources";
-import { ConsumptionManagementClient } from "@azure/arm-consumption";
-import { getClient } from './clients/credentials';
-import { WebSiteManagementClient } from '@azure/arm-appservice';
+import ResourceGroup from './features/resource-group';
+import StaticSiteFreeTier from './features/static-site-free-tier';
+import { SimpleTagBudget } from './features/simple-tag-budget';
+import FunctionApp from './features/function-app';
 
 const GROUP_NAME = 'rappenspalter';
 const APP_NAME = 'rappenspalter';
 const SWITZERLANDNORTH = 'switzerlandnorth';
 const WESTEUROPE = 'westeurope';
 
-function main() {
+async function main() {
     const logLevel = process.env["AZURE_LOG_LEVEL"] as AzureLogLevel;
     logLevel && setLogLevel(logLevel);
 
-    const resourceGroupClient = getClient(ResourceManagementClient);
-    const consumptionClient = getClient(ConsumptionManagementClient);
-    const webSiteClient = getClient(WebSiteManagementClient);
+    const group = new ResourceGroup(GROUP_NAME, GROUP_NAME, SWITZERLANDNORTH, undefined, 50);
+    const web = new StaticSiteFreeTier("rappenspalter-web", GROUP_NAME, WESTEUROPE, undefined, 10);
 
+    const functions = new FunctionApp("rappenspalter-functions", GROUP_NAME, SWITZERLANDNORTH, undefined, 10);
 
-    resourceGroupClient.resourceGroups.createOrUpdate(APP_NAME, {
-        location: WESTEUROPE
-    }).then((resourceGroup: ResourceGroup) => {
+    group.children.push(web);
+    group.children.push(functions);
 
-        webSiteClient.staticSites.beginCreateOrUpdateStaticSiteAndWait(GROUP_NAME, APP_NAME, {
-            location: WESTEUROPE,
-            tags: { 'cost-center': 'basic' },
-            sku: { name: 'Free', tier: 'Free' },
-            repositoryUrl: 'https://github.com/baking-bread/rappenspalter',
-            branch: 'main',
-            stagingEnvironmentPolicy: 'Enabled',
-            allowConfigFileUpdates: true,
-            provider: 'GitHub',
-            enterpriseGradeCdnStatus: 'Disabled',
-          }).then((result) => {
-            console.log(result);
-            });
-
-        const firstOfMonth = new Date();
-        firstOfMonth.setDate(1);
-
-        consumptionClient.budgets.createOrUpdate(`/subscriptions/${process.env.AZURE_SUBSCRIPTION_ID}/resourceGroups/${APP_NAME}`, 'basic', {
-            category: 'Cost',
-            timeGrain: 'Monthly',
-            amount: 10,
-            timePeriod: {
-                startDate: firstOfMonth,
-            },
-            filter: {
-                tags: {
-                    name: "cost-center",
-                    values: ["basic"],
-                    operator: "In",
-                }
-            }
-        });
-
-    });
+    await group.apply();
 }
 
 main()

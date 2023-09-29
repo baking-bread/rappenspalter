@@ -24,9 +24,13 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@azure/arm-apimanagement": "^9.1.0",
     "@azure/arm-appservice": "^14.0.0",
+    "@azure/arm-compute": "^21.2.0",
     "@azure/arm-consumption": "^9.2.0",
     "@azure/arm-cosmosdb": "^15.5.0",
+    "@azure/arm-features": "^3.1.0",
+    "@azure/arm-logic": "^8.2.0",
     "@azure/arm-resources": "^5.2.0",
     "@azure/identity": "^3.3.0",
     "@azure/logger": "^1.0.4",
